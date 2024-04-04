@@ -1,0 +1,1 @@
+Its the IOT project which detect the motion and activated the voice control 

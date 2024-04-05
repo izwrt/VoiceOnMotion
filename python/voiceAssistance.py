@@ -7,7 +7,7 @@ recognizer = sr.Recognizer()
 engine = pyttsx3.init()
 
 # Function to recognize speech
-def recognize_speech(prompt, timeout=5):
+def recognize_speech(prompt, timeout=10):
     with sr.Microphone() as source:
         print(prompt)
         recognizer.adjust_for_ambient_noise(source)  # Adjust for ambient noise
@@ -64,11 +64,11 @@ def recognize_user():
         file_name = f"{name.lower().replace(' ', '_')}_info.txt"
         if os.path.exists(file_name):
             speak("Nice to see you again, " + name + "!")
-            return name, file_name
+            return name, file_name  # Return both name and file name
         else:
             get_user_info(name)
-            return name, file_name
-    return None, None
+            return name, file_name  # Return both name and file name
+    return None, None 
 
 
 # Main function
@@ -76,41 +76,34 @@ def main():
     user_name, user_file = recognize_user()
     if user_name:
         print("User recognized:", user_name)
+        user_file = f"{user_name.lower().replace(' ', '_')}_info.txt"
         while True:
             if os.path.exists(user_file):
-                speak(f"{user_name}, what would you like to know about yourself?")
-            else:
-                speak(f"Do you have any questions about yourself, {user_name}?")
-            response = recognize_speech("Listening for response...")
-            if response:
-                if "yes" in response:
-                    speak("What would you like to know?")
-                    query = recognize_speech("Listening for query...")
-                    if query:
-                        with open(user_file, "r") as file:
-                            found = False
-                            for line in file:
-                                if query.lower() in line.lower():
-                                    speak(line.strip())
-                                    found = True
-                                    break
-                            if not found:
-                                speak("I'm sorry, I couldn't find the information you requested.")
-                                speak("Would you like to provide this information?")
-                                response = recognize_speech("Listening for response...")
-                                if response and "yes" in response:
-                                    speak(f"Sure, please tell me about your {query}.")
-                                    info = recognize_speech("Listening for information...")
-                                    if info:
-                                        with open(user_file, "a") as file:
-                                            file.write(f"{query.capitalize()}: {info}\n")
-                                        speak("Thank you! I've added this information to your file.")
-                else:
-                    speak("Okay, let me know if you have any other questions.")
-                    break
-    else:
-        print("Failed to recognize user.")
+                        speak("What would you like to know?")
+                        query = recognize_speech("Listening for query...")
+                        if query:
+                            with open(user_file, "r") as file:
+                                found = False
+                                for line in file:
+                                    if query.lower() in line.lower():
+                                        speak(line.strip())
+                                        found = True
+                                        break
+                                if not found:
+                                    speak("I'm sorry, I couldn't find the information you requested.")
+                                    modified_query = query.replace("my", "your")
 
+                                    speak(f"Would you like to provide your {modified_query}?")
+                                    response = recognize_speech("Listening for response...")
+                                    if response:
+                                            with open(user_file, "a") as file:
+                                                file.write(f"{modified_query.capitalize()}: {response}\n")
+                                            speak("Thank you! I've added this information to your file.")
+                        else:
+                            speak("Okay, let me know if you have any other questions.")
+                            continue  # Continue looping to check for more questions
+     
 
 if __name__ == "__main__":
     main()
+

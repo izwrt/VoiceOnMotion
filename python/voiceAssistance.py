@@ -79,31 +79,34 @@ def main():
         user_file = f"{user_name.lower().replace(' ', '_')}_info.txt"
         while True:
             if os.path.exists(user_file):
-                        speak("What would you like to know?")
-                        query = recognize_speech("Listening for query...")
-                        if query:
-                            with open(user_file, "r") as file:
-                                found = False
-                                for line in file:
-                                    if query.lower() in line.lower():
-                                        speak(line.strip())
-                                        found = True
-                                        break
-                                if not found:
-                                    speak("I'm sorry, I couldn't find the information you requested.")
-                                    modified_query = query.replace("my", "your")
+                speak("What would you like to know?")
+                query = recognize_speech("Listening for query...")
+                if query:
+                    with open(user_file, "r") as file:
+                        found = False
+                        for line in file:
+                            if query.lower() in line.lower():
+                                speak(line.strip())
+                                found = True
+                                break
+                        if not found:
+                            speak("I'm sorry, I couldn't find the information you requested.")
+                            modified_query = query.replace("my", "your")
 
-                                    speak(f"Would you like to provide your {modified_query}?")
-                                    response = recognize_speech("Listening for response...")
-                                    if response:
-                                            with open(user_file, "a") as file:
-                                                file.write(f"{modified_query.capitalize()}: {response}\n")
-                                            speak("Thank you! I've added this information to your file.")
-                        else:
-                            speak("Okay, let me know if you have any other questions.")
-                            continue  # Continue looping to check for more questions
-     
+                        speak(f"Would you like to share {modified_query} with me?")
+                        response = recognize_speech("Listening for response...")
+                        if response:
+                            if "no" in response.lower() or "don't" in response.lower():
+                                speak("Okay, I understood.")
+                                print("not added file")
+                            else:
+                                with open(user_file, "a") as file:
+                                    file.write(f"{modified_query.capitalize()}: {response}\n")
+                                speak("Thank you! I've added this information to your file.")
+
+            else:
+                speak("Okay, let me know if you have any other questions.")
+                continue  # Continue looping to check for more questions
 
 if __name__ == "__main__":
     main()
-

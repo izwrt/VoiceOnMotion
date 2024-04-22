@@ -19,6 +19,7 @@ def recognize_speech(prompt, timeout=10):
             return text.lower()
         except sr.UnknownValueError:
             print("Sorry, I didn't catch that.")
+            speak("Sorry, I didn't catch that.")
             return None
         except sr.RequestError:
             print("Sorry, I couldn't request results; please check your internet connection.")
@@ -84,8 +85,10 @@ def main():
                 if query:
                     with open(user_file, "r") as file:
                         found = False
+                        query_words = query.lower().split()  # Split query into lowercase words
                         for line in file:
-                            if query.lower() in line.lower():
+                            line_words = line.lower().split(":")[0].split()  # Split line into lowercase words and get the first part
+                            if any(word in line_words for word in query_words):  # Check if any word from the query matches any word from the line
                                 speak(line.strip())
                                 found = True
                                 break
@@ -93,8 +96,8 @@ def main():
                             speak("I'm sorry, I couldn't find the information you requested.")
                             modified_query = query.replace("my", "your")
 
-                        speak(f"Would you like to share {modified_query} with me?")
-                        response = recognize_speech("Listening for response...")
+                            speak(f"Would you like to share {modified_query} with me?")
+                            response = recognize_speech("Listening for response...")
                         if response:
                             if "no" in response.lower() or "don't" in response.lower():
                                 speak("Okay, I understood.")

@@ -1,3 +1,0 @@
-Name: john
-Location: india
-Hobbies: cricket
